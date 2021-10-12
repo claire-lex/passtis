@@ -17,7 +17,7 @@ optional arguments:
                         Comma-separated word(s) to use
   -f file, --file file  File containing a list of words
   -p postcode (69|69100), --postcode postcode (69|69100)
-                        Postcode to use (all other are moved)
+                        Postcode to use (can also be "42,73")
   -s specialchars, --special specialchars
                         Special chars to use (can be empty string)
   -m, --month           Use months as base (in french)
@@ -74,6 +74,13 @@ OPTIONS = init_options()
 # 0-10 and 00-09
 NUM = [str(x) for x in list(range(0, 100))]
 NUM += [str(x).zfill(2) for x in list(range(0, 10))]
+# Sequence (from 123 to 123456789 and from 0123 to 0123456789)
+suite1 = [str(x) for x in range(1, 10)]
+NUM += ["".join(suite1[:x]) for x in range(3,10)]
+suite0 = [str(x) for x in range(0, 10)]
+NUM += ["".join(suite0[:x]) for x in range(4,10)]
+# Special sequence
+NUM += ["456", "789"]
 
 if OPTIONS.special != None: # Can be empty string
     SPECIALS = OPTIONS.special

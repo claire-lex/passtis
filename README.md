@@ -48,7 +48,7 @@ optional arguments:
                         Comma-separated word(s) to use
   -f file, --file file  File containing a list of words
   -p postcode (69|69100), --postcode postcode (69|69100)
-                        Postcode to use (all other are moved)
+                        Postcode to use (can also be "42,73")
   -s specialchars, --special specialchars
                         Special chars to use (can be empty string)
   -m, --month           Use months as base (in french)
@@ -87,7 +87,6 @@ Passtis, qui va générer des mots de passe qui ont les formats suivants :
 ```
 (BASE, SUFFIX), # Bernard42
 (BASE, SPECIALS), # Bernard*
-(SUFFIX, SPECIALS), # 260143!
 (BASE, SUFFIX, SPECIALS), # Bernard42!
 (BASE, SPECIALS, SUFFIX)  # Bernard@2021
 ```
@@ -123,7 +122,7 @@ momots!
 ```
 
 Pour les mots inférieurs à 5 caractères, des versions "combinées" sont également
-créées et intégrer au dictionnaire final. Ce comportement est désactivable avec
+créées et intégrées au dictionnaire final. Ce comportement est désactivable avec
 l'option `-x`.
 
 Par exemple: `sql` et `user` produiront également des sorties `usersql` et
@@ -139,12 +138,16 @@ Ces listes peuvent être combinées avec les options `-w` et `-f`
 
 Les suffixes sont les ajouts faits à cette base, entrecoupés ou non de
 caractères spéciaux. Tous les sont désactivés par défaut à part `NUM` qui
-consiste en une séquence de chiffres de 0 à 99 et de 00 à 09.
+consiste en une séquence de chiffres de 0 à 99, de 00 à 09 ainsi que des suites
+type 123, 456, 789 puis de 1234 à 123456789 et de 0123 à 012356789.
+
+> S'il vous manque un format de suffixe (ex : 987654321, vous pouvez l'ajouter
+  en tant que mot (BASE) ou vous pouvez modifier le code directement :p
 
 #### Caractères spéciaux
 
 Finalement, il existe un set de caractères spéciaux par défaut, mais vous pouvez
-les remplacer par les votre avec l'option `-s`:
+les remplacer par les vôtres avec l'option `-s`:
 
 ```
 $> python passtis.py -f dico.txt -s "!@"
@@ -156,3 +159,6 @@ Améliorations possibles
 - [ ] Pouvoir choisir le format de la date (ex: ddmmyyyy)
 - [ ] Pouvoir choisir l'intervalle de la date (par exemple, du 01012010 au 31122011)
 - [ ] Choix de la taille minimum pour les combinaisons
+- [ ] Pouvoir préciser une politique de mot de passe :
+    - [ ] Longueur minimum
+    - [ ] Présence de caractères spéciaux

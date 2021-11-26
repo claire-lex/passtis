@@ -26,6 +26,7 @@ optional arguments:
   -x., --nocombo        Do not build combined words with short words
 """
 
+from os.path import join, dirname
 from datetime import date, timedelta
 from argparse import ArgumentParser
 from itertools import combinations
@@ -108,13 +109,14 @@ if OPTIONS.date:
 POSTCODES = []
 if OPTIONS.postcode:
     # French post/zip code using INSEE's list
-    POSTCODES_FILE = "postcode_insee_20210923.csv"
+    POSTCODES_FILE = join(dirname(__file__), "postcode_insee_20210923.csv")
     with open(POSTCODES_FILE, 'r', encoding='ISO-8859-1') as fd:
         postcodes = [x.strip().split(";")[1] for x in fd]
     # We add department number (ex: 69 for 69***, 974)
     postcodes += [str(x).zfill(2) for x in list(range(1, 96))] + [str(x) for x in range(974, 989)]
     # Now we take only the ones we need
     selected = [OPTIONS.postcode] if "," not in OPTIONS.postcode else OPTIONS.postcode.split(",")
+    POSTCODES += selected
     for pc in selected:
         POSTCODES += [x for x in postcodes if x.startswith(pc)]
 

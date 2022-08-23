@@ -37,6 +37,7 @@ from itertools import combinations
 
 # Values that may change -----------------------------------------------------#
 
+MIN_YEAR = 1970
 MAX_YEAR = 2022
 SPECIALS = "&#@+$%*?/!§"
 COMBO_MAX_LEN = 5 # Maximum length of words that will be combined
@@ -95,14 +96,14 @@ if OPTIONS.month:
 
 YEARS = []
 if OPTIONS.year:
-    YEARS = [str(x) for x in range(1970, MAX_YEAR + 1)]
+    YEARS = [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)]
 
 DATES = []
 if OPTIONS.date:
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
-    DATES = [x.strftime("%d%m%y") for x in daterange(date(1970, 1, 1), date(MAX_YEAR, 12, 31))]
+    DATES = [x.strftime("%d%m%y") for x in daterange(date(MIN_YEAR, 1, 1), date(MAX_YEAR, 12, 31))]
 
 # Post codes -----------------------------------------------------------------#
 

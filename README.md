@@ -64,8 +64,8 @@ Usage
 
 ```
 $> python passtis.py -h
-usage: passtis.py [-h] [-w words] [-f file] [-p postcode (69|69100)]
-                  [-s specialchars] [-m] [-d] [-y] [-xc]
+usage: passtis.py [-h] [-w words] [-f file] [-p postcode (69|69100)] [-s
+specialchars] [-m] [-d] [-y] [-n] [-x]
 
 French password dictionary builder
 
@@ -75,13 +75,14 @@ optional arguments:
                         Comma-separated word(s) to use
   -f file, --file file  File containing a list of words
   -p postcode (69|69100), --postcode postcode (69|69100)
-                        Postcode to use (can also be "42,73")
+                        Postcode to use (all other are moved)
   -s specialchars, --special specialchars
                         Special chars to use (can be empty string)
   -m, --month           Use months as base (in french)
   -d, --date            Use dates as suffix with format ddmmyy
   -y, --year            Use years as suffix with format yyyy
-  -x, --nocombo        Do not build combined words with short words
+  -n, --noleet          Do not use leet transformations on words (e.g. P@ssw0rd$)
+  -x, --nocombo         Do not build combined words with short words
 ```
 
 Détails
@@ -107,7 +108,7 @@ Actuellement, les bases et les suffixes sont constitués d'un certain nombre de
 types d'objets, activables ou modifiables avec les arguments :
 
 ```
-BASE = WORDS + MONTHS
+BASE = WORDS + LEET + MONTHS
 SUFFIX = NUM + YEARS + POSTCODES + DATES
 SPECIALS
 ```
@@ -120,11 +121,13 @@ SPECIALS
 Une base est un mot issu d'une liste prédéfinie et/ou spécifiée par
 l'utilisateur.  Les listes peuvent être combinées.
 
-
-* **MONTHS** est une liste prédéfinie de mois (en français), activable avec `-m`
 * **WORDS** correspond à une liste de mots définis par l'utilisateur, passée via
   un fichier (`-f`) et/ou directement en argument (`-w`). Les deux options
   sont combinables. Une liste peut ne comporter qu'un seul mot.
+* **LEET** contient WORDS, mais chaque occurrence subit plusieurs
+    transformations basées sur des substitutions de caractères prédéfinies (ex :
+    w0rds), désactivable avec `-n`.
+* **MONTHS** est une liste prédéfinie de mois (en français), activable avec `-m`
 
 ```
 $> python passtis.py -w en1mot,mot,en2mots,momots!
@@ -138,10 +141,12 @@ en2mots
 momots!
 ```
 
-Pour chaque possibilité de mot de passe généré, une base est utilisée deux fois :
+Pour chaque possibilité de mot de passe généré, une base est utilisée au moins
+deux fois, et trois fois par défaut :
 
 1. Tel quel (`en1mot42`)
 2. En version capitalisée (`En1mot42`)
+3. En version "leet", si activé (`3n1mot42, En1m0t42, 3n1m0t42`)
 
 Pour les mots inférieurs à 5 caractères, des versions "combinées" sont également
 créées et intégrées au dictionnaire final. Ce comportement est désactivable avec
@@ -149,7 +154,6 @@ l'option `-x`.
 
 Par exemple: `sql` et `user` produiront également des sorties `usersql` et
 `sqluser`.
-
 
 ### SUFFIX
 
@@ -198,23 +202,27 @@ Notes sur l'utilisation de Passtis
    ```
    # Un seul mot, seulement deux caractères spéciaux choisis, aucune autre option
    $> python passtis.py -w pingouin -s '@!' | wc -l
-   1255
+   22590
    
    # Un seul mot, aucune autre option
    $> python passtis.py -w pingouin | wc -l
+   103914
+
+   # Un seul mot, leet désactivé, aucune autre option
+   $> python passtis.py -w pingouin -n | wc -l
    5773
 
    # Un seul mot, utilisation des codes postaux du département 69
    $> python passtis.py -w pingouin -p69 | wc -l
-   21735
+   391230
 
    # Deux mots, ajout de la liste des mois en tant que base
    $> python passtis.py -w pingouin,lama -m | wc -l
-   80822
+   225147
 
    # Un seul mot, options date, mois et années activées
    $> python passtis.py -w pingouin -dmy | wc -l
-   11682229   
+   11796930
    ```
 
 Améliorations possibles
@@ -225,4 +233,3 @@ Améliorations possibles
 - [ ] Choix de la taille minimum pour les combinaisons
 - [ ] Pouvoir préciser une politique de mot de passe :
     - [ ] Longueur minimum
-    - [ ] Présence de caractères spéciaux

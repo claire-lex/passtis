@@ -7,7 +7,7 @@
 
 """
 usage: passtis.py [-h] [-w words] [-f file] [-p postcode (69|69100)]
-                  [-s specialchars] [-m] [-d] [-y] [-xc]
+[-s specialchars] [-m] [-d] [-y] [-n] [-x]
 
 French password dictionary builder
 
@@ -17,19 +17,20 @@ optional arguments:
                         Comma-separated word(s) to use
   -f file, --file file  File containing a list of words
   -p postcode (69|69100), --postcode postcode (69|69100)
-                        Postcode to use (can also be "42,73")
+                        Postcode to use (all other are moved)
   -s specialchars, --special specialchars
                         Special chars to use (can be empty string)
   -m, --month           Use months as base (in french)
   -d, --date            Use dates as suffix with format ddmmyy
   -y, --year            Use years as suffix with format yyyy
-  -x., --nocombo        Do not build combined words with short words
+  -n, --noleet          Do not use leet transformations on words (e.g. P@ssw0rd$)
+  -x, --nocombo         Do not build combined words with short words
 """
 
 from os.path import join, dirname
 from datetime import date, timedelta
 from argparse import ArgumentParser
-from itertools import combinations
+from itertools import combinations, product
 
 #-----------------------------------------------------------------------------#
 # Constants & config                                                          #
@@ -37,7 +38,7 @@ from itertools import combinations
 
 # Values that may change -----------------------------------------------------#
 
-MIN_YEAR = 1970
+MIN_YEAR = 2000
 MAX_YEAR = 2022
 SPECIALS = "&#@+$%*?/!§"
 COMBO_MAX_LEN = 5 # Maximum length of words that will be combined
@@ -53,6 +54,7 @@ OPTS_DICT = (
     ("-m", "--month", "Use months as base (in french)", False, None),
     ("-d", "--date", "Use dates as suffix with format ddmmyy", False, None),
     ("-y", "--year", "Use years as suffix with format yyyy", False, None),
+    ("-n", "--noleet", "Do not use leet transformations on words (e.g. P@ssw0rd$)", False, None),
     ("-x", "--nocombo", "Do not build combined words with short words", False, None)
 )
 
@@ -86,6 +88,21 @@ NUM += ["456", "789"]
 
 if OPTIONS.special != None: # Can be empty string
     SPECIALS = OPTIONS.special
+
+# Leet mode ------------------------------------------------------------------#
+
+# List taken from psudohash (https://github.com/t3l3machus/psudohash)
+# Don't forget to check this awesome tool!
+LEET_TABLE = {
+    'a' : ['@', '4'],
+    # 'b' : ['8'],
+    'e' : ['3'],
+    # 'g' : ['9', '6'],
+    'i' : ['1', '!'],
+    'o' : ['0'],
+    's' : ['$', '5'],
+    't' : ['7']
+}
 
 # Dates ----------------------------------------------------------------------#
 
@@ -145,6 +162,23 @@ if not OPTIONS.nocombo:
     WORDS += ["".join(x) for x in combos] # Regular: [user, ext] == userext
     WORDS += ["".join(y) for y in combos[::1]] # Reverse: extuser
 
+def leet_transformations():
+    results = []
+    for word in WORDS:
+        combinations = []
+        for char in word:
+            if char in LEET_TABLE:
+                combinations.append(LEET_TABLE[char] + [char])
+            else:
+                combinations.append([char])
+            # Générer toutes les combinaisons possibles
+        results += [''.join(combination) for combination in product(*combinations)]
+    return results
+
+# We create leet transformations for each words, see LEET_TABLE for details
+if not OPTIONS.noleet:
+    WORDS += leet_transformations()
+    
 # Remove duplicates
 WORDS = list(set(WORDS))
 
@@ -152,13 +186,13 @@ WORDS = list(set(WORDS))
 
 BASE = WORDS + MONTHS
 SUFFIX = NUM + YEARS + POSTCODES + DATES
-FORMATS = (
+FORMATS = [
     (BASE, SUFFIX), # Thierry42
     (BASE, SPECIALS), # Bernard*
     # (SUFFIX, SPECIALS), # 260143! - Weird result but uncomment if you need it
     (BASE, SUFFIX, SPECIALS), # Bernard42!
     (BASE, SPECIALS, SUFFIX)  # Thierry@2021
-)
+]
 
 #-----------------------------------------------------------------------------#
 # Run                                                                         #

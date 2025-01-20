@@ -65,7 +65,7 @@ Usage
 ```
 $> python passtis.py -h
 usage: passtis.py [-h] [-w words] [-f file] [-p postcode (69|69100)] [-s
-specialchars] [-m] [-d] [-y] [-n] [-x]
+specialchars] [-l length] [-m] [-d] [-y] [-n] [-x]
 
 French password dictionary builder
 
@@ -78,6 +78,8 @@ optional arguments:
                         Postcode to use (all other are moved)
   -s specialchars, --special specialchars
                         Special chars to use (can be empty string)
+  -l length, --minlength length
+                        Minimum length
   -m, --month           Use months as base (in french)
   -d, --date            Use dates as suffix with format ddmmyy
   -y, --year            Use years as suffix with format yyyy
@@ -231,5 +233,3 @@ Améliorations possibles
 - [ ] Pouvoir choisir le format de la date (ex: ddmmyyyy)
 - [ ] Pouvoir choisir l'intervalle de la date (par exemple, du 01012010 au 31122011)
 - [ ] Choix de la taille minimum pour les combinaisons
-- [ ] Pouvoir préciser une politique de mot de passe :
-    - [ ] Longueur minimum

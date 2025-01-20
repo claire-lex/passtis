@@ -51,6 +51,7 @@ OPTS_DICT = (
     ("-f", "--file", "File containing a list of words", None, "file"),
     ("-p", "--postcode", "Postcode to use (all other are moved)", None, "postcode (69|69100)"),
     ("-s", "--special", "Special chars to use (can be empty string)", None, "specialchars"),
+    ("-l", "--minlength", "Minimum length", None, "length"),
     ("-m", "--month", "Use months as base (in french)", False, None),
     ("-d", "--date", "Use dates as suffix with format ddmmyy", False, None),
     ("-y", "--year", "Use years as suffix with format yyyy", False, None),
@@ -194,22 +195,32 @@ FORMATS = [
     (BASE, SPECIALS, SUFFIX)  # Thierry@2021
 ]
 
+try:
+    MINLENGTH = int(OPTIONS.minlength) if OPTIONS.minlength else 0
+except ValueError:
+    print("Error: Invalid value for minimum length argument.")
+    exit(-1)
+    
 #-----------------------------------------------------------------------------#
 # Run                                                                         #
 #-----------------------------------------------------------------------------#
 
+def psprint(entry):
+    if len(entry) >= MINLENGTH:
+        print(entry)
+
 # Base only
 for base in BASE:
-    print(base)
+    psprint(base)
 
 # Iterate over formats (very dirty code, I expect to be more inspired later)
 for pformat in FORMATS:
     for item1 in pformat[0]:
         for item2 in pformat[1]:
             if len(pformat) == 2:
-                print("".join([item1, item2]))
-                print("".join([item1, item2]).capitalize())
+                psprint("".join([item1, item2]))
+                psprint("".join([item1, item2]).capitalize())
             elif len(pformat) == 3:
                 for item3 in pformat[2]:
-                    print("".join([item1, item2, item3]))
-                    print("".join([item1, item2, item3]).capitalize())
+                    psprint("".join([item1, item2, item3]))
+                    psprint("".join([item1, item2, item3]).capitalize())

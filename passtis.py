@@ -28,7 +28,7 @@ optional arguments:
 """
 
 from os.path import join, dirname
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from argparse import ArgumentParser
 from itertools import combinations, product
 
@@ -39,7 +39,7 @@ from itertools import combinations, product
 # Values that may change -----------------------------------------------------#
 
 MIN_YEAR = 2000
-MAX_YEAR = 2022
+MAX_YEAR = datetime.today().year
 SPECIALS = "&#@+$%*?/!§"
 COMBO_MAX_LEN = 5 # Maximum length of words that will be combined
 WORDS = [] # Can be changed with options 'words' and 'file'
